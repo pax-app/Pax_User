@@ -16,11 +16,3 @@ def create_app(script_info=None):
     app.register_blueprint(users_blueprint)
 
     return app
-
-
-@app.route('/users/ping', methods=['GET'])
-def ping_pong():
-    return jsonify({
-        'status': 'success',
-        'message': 'pong!'
-    })
