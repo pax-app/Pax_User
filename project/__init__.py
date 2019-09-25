@@ -1,10 +1,21 @@
+import os
 from flask import Flask, jsonify
-# instantiate the app
-app = Flask(__name__)
+from project.api.views import users_blueprint
 
-# set config
-app.config.from_object('project.config.DevelopmentConfig')
-# new
+
+# instantiate the app
+def create_app(script_info=None):
+    # Instantiate the app
+    app = Flask(__name__)
+
+    # Set Configuration
+    app_settings = os.getenv('APP_SETTINGS')
+    app.config.from_object(app_settings)
+
+    # register blueprints
+    app.register_blueprint(users_blueprint)
+
+    return app
 
 
 @app.route('/users/ping', methods=['GET'])

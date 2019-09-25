@@ -3,17 +3,19 @@ FROM python:3.6.5-alpine
 
 
 # set working directory
-WORKDIR /usr/src/app
+WORKDIR /app
+
+# Install Dependencies
+RUN apk update && \
+    apk add --virtual build-deps gcc python-dev musl-dev
+
+# Dealing with requirements
+COPY ./requirements.txt /app/requirements.txt
+RUN pip	install	-r	requirements.txt
 
 
-# add and install requirements
-COPY ./requirements.txt /usr/src/app/requirements.txt
-
-RUN pip install -r requirements.txt
-
-
-# add app
-COPY . /usr/src/app
+# Coping project
+COPY . /app
 
 
 # run server
