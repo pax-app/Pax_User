@@ -10,8 +10,8 @@ services:
       - 5001:5000
     environment:
       - FLASK_APP=project/__init__.py
-      - FLASK_ENV=production
-      - APP_SETTINGS=project.config.ProductionConfig
+      - FLASK_ENV=development
+      - APP_SETTINGS=project.config.DevelopmentConfig
       - DATABASE_URL=postgres://postgres:postgres@db:5432/users_dev
       - DATABASE_TEST_URL=postgres://postgres:postgres@db:5432/users_test
-      - SECRET_KEY=my_precious_key
+      - SECRET_KEY=my_precious
