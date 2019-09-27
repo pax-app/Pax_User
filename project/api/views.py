@@ -1,14 +1,27 @@
-from flask import request, jsonify, Blueprint
-
+from __future__ import print_function  # In python 2.7
+from flask import request, jsonify, Blueprint, abort
+import sys
+import json
 
 users_blueprint = Blueprint('user', __name__)
+
+
+def checkLoginInfo(loginInfo):
+    if('email' not in loginInfo or 'password' not in loginInfo):
+        return False
+    return True
+
 
 # User Registration Route
 @users_blueprint.route('/auth/registration', methods=['POST'])
 def user_registration():
-    return jsonify({
-        'message': 'registration'
-    })
+    print(sys.path, file=sys.stderr)
+    if(request.is_json and checkLoginInfo(request.json)):
+        return jsonify({
+            'message': '%s' % (request.get_json())
+        })
+    else:
+        abort(400)
 
 # User Login Route
 @users_blueprint.route('/auth/login', methods=['POST'])
@@ -37,18 +50,6 @@ def user_token_refresh():
     return jsonify({
         'message': 'tokenRefresh'
     })
-
-# Test Propourses (will be removed)
-@users_blueprint.route('/auth/all', methods=['GET', 'DELETE'])
-def all_users():
-    if request.method == 'GET':
-        return jsonify({
-            'message': 'allUsersGet'
-        })
-    else:
-        return jsonify({
-            'message': 'allUsersDelete'
-        })
 
 # secret endpoint (to test access with tokens)
 @users_blueprint.route('/secret-resource', methods=['GET'])
