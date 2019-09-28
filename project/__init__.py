@@ -1,10 +1,8 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask
 from project.api.views import users_blueprint
-from database import db, migrate, bcrypt
-import jwt
-
-# instantiate the app
+from project.api import bcrypt
+from database import db, migrate
 
 
 def create_app(script_info=None):

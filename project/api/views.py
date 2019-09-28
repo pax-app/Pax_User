@@ -1,9 +1,7 @@
-from __future__ import print_function  # In python 2.7
-from flask import request, jsonify, Blueprint, abort, current_app
-import sys
-import json
+from flask import request, jsonify, Blueprint
 from project.api.models import UserModel
-from database import db, bcrypt
+from database import db
+from project.api import bcrypt
 from project.api.utils import authenticate
 
 users_blueprint = Blueprint('user', __name__)

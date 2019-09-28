@@ -1,4 +1,5 @@
-from database import db, bcrypt
+from database import db
+from project.api import bcrypt
 from flask import current_app
 import datetime
 import jwt
