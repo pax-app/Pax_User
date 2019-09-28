@@ -2,6 +2,7 @@ import os
 from flask import Flask, jsonify
 from project.api.views import users_blueprint
 from database import db, migrate, bcrypt
+import jwt
 
 # instantiate the app
 

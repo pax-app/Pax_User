@@ -1,9 +1,10 @@
 from __future__ import print_function  # In python 2.7
-from flask import request, jsonify, Blueprint, abort
+from flask import request, jsonify, Blueprint, abort, current_app
 import sys
 import json
 from project.api.models import UserModel
 from database import db, bcrypt
+from project.api.utils import authenticate
 
 users_blueprint = Blueprint('user', __name__)
 
@@ -43,9 +44,13 @@ def user_registration():
 
     try:
         user.save_to_db()
-        return jsonify(createSuccessMessage('User {} was created'.format(name))), 200
+        auth_token = user.encode_auth_token(user.user_id)
+        response_object = createSuccessMessage('User was created')
+        response_object["auth_token"] = auth_token.decode()
+        return jsonify(response_object), 201
     except:
-        return jsonify(createFailMessage('DB out of reach')), 503
+        db.session.rollback()
+        return jsonify(createFailMessage('Try again later')), 503
         # User Login Route
 
 
@@ -59,40 +64,42 @@ def user_login():
     email = post_data["email"]
     password = post_data["password"]
 
-    current_user = UserModel.find_by_email(email)
+    try:
+        current_user = UserModel.find_by_email(email)
 
-    if not current_user:
-        return jsonify(createFailMessage('User {} doesn\'t exist'.format(email))), 400
+        if not current_user:
+            return jsonify(createFailMessage('User {} doesn\'t exist'.format(email))), 404
 
-    if current_user and bcrypt.check_password_hash(current_user.password, password):
-        return jsonify(createSuccessMessage('Logged in as {}'.format(current_user.username))), 200
-    else:
-        return jsonify(createFailMessage('Wrong Credentials')), 401
+        if current_user and bcrypt.check_password_hash(current_user.password, password):
+            auth_token = current_user.encode_auth_token(current_user.user_id)
+            response_object = createSuccessMessage('Successfully logged in.')
+            response_object["auth_token"] = auth_token.decode()
+
+            return jsonify(response_object), 200
+        else:
+            return jsonify(createFailMessage('Wrong Credentials')), 401
+    except:
+        return jsonify(createFailMessage("Try again")), 500
 
 # Logout for access
-@users_blueprint.route('/auth/logout/access', methods=['POST'])
-def user_logout_access():
-    return jsonify({
-        'message': 'logoutAccess'
-    })
+@users_blueprint.route('/auth/logout', methods=['GET'])
+@authenticate
+def user_logout(resp):
+    response_object = {
+        'status': 'success',
+        'message': 'Successfully logged out.'
+    }
+    return jsonify(response_object), 200
 
-# Logout for Refresh Token
-@users_blueprint.route('/auth/logout/refresh', methods=['POST'])
-def user_logout_refresh():
-    return jsonify({
-        'message': 'logoutRefresh'
-    })
 
-# Token Refresh
-@users_blueprint.route('/auth/token/refresh', methods=['POST'])
-def user_token_refresh():
-    return jsonify({
-        'message': 'tokenRefresh'
-    })
-
-# secret endpoint (to test access with tokens)
-@users_blueprint.route('/secret-resource', methods=['GET'])
-def secret_resource():
-    return jsonify({
-        'answer': 42
-    })
+@users_blueprint.route('/auth/status', methods=['GET'])
+@authenticate
+def get_user_status(resp):
+    user = UserModel.query.filter_by(user_id=resp).first()
+    auth_token = user.encode_auth_token(user.user_id)
+    response_object = {
+        'status': 'success',
+        'message': 'success',
+        'data': user.to_json()
+    }
+    return jsonify(response_object), 200
