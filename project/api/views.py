@@ -45,6 +45,8 @@ def user_registration():
         auth_token = user.encode_auth_token(user.user_id)
         response_object = createSuccessMessage('User was created')
         response_object["auth_token"] = auth_token.decode()
+        response_object["name"] = name
+        response_object["email"] = email
         return jsonify(response_object), 201
     except:
         db.session.rollback()
@@ -72,7 +74,8 @@ def user_login():
             auth_token = current_user.encode_auth_token(current_user.user_id)
             response_object = createSuccessMessage('Successfully logged in.')
             response_object["auth_token"] = auth_token.decode()
-
+            response_object["name"] = current_user.name
+            response_object["email"] = current_user.email
             return jsonify(response_object), 200
         else:
             return jsonify(createFailMessage('Wrong Credentials')), 401
