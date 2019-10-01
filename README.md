@@ -1,4 +1,4 @@
-# Pax_User
+# User
 
 Microsserviço responsável por toda interação do usuário, como login, registro.
 
@@ -7,6 +7,5 @@ Microsserviço responsável por toda interação do usuário, como login, regist
 Com o Docker e Docker-Compose instalados, basta apenas utilizar os comandos:
 
 ```shell
-    docker-compose -f docker-compose-dev.yml build
-    docker-compose -f docker-compose-dev.yml up
+    sudo docker-compose up
 ```
