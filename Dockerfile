@@ -5,7 +5,7 @@ FROM python:3.6.5-alpine
 # set working directory
 WORKDIR /app
 
-# Install Dependencies
+# Install Dependencies (libffi-dev is necessary for cffi (bcrypt dependency))
 RUN apk update && \
     apk add --virtual build-deps gcc python-dev musl-dev libffi-dev
 
