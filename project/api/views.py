@@ -104,3 +104,30 @@ def get_user_status(resp):
         'data': user.to_json()
     }
     return jsonify(response_object), 200
+
+# Provider Registration Route
+@users_blueprint.route('/provider_registration', methods=['POST'])
+def provider_registration():
+    post_data = request.json
+
+    if(not request.is_json or not post_data):
+        return jsonify(createFailMessage("Invalid Payload")), 400
+
+    minimum_price = post_data["minimum_price"]
+    maximum_price = post_data["maximum_price"]
+    bio = post_data["bio"]
+    url_rg_photo = post_data["url_rg_photo"]
+    issuing_organ = post_data["issuing_organ"]
+    uf = post_data["uf"]
+    number = post_data["number"]
+    user_id = post_data["user_id"]
+
+    user = UserModel(minimum_price, maximum_price, bio, url_rg_photo, issuing_organ, uf, number, user_id)
+
+    try:
+        user.save_to_db()
+        response_object = createSuccessMessage('Provider was created')
+        return jsonify(response_object), 201
+    except:
+        db.session.rollback()
+        return jsonify(createFailMessage('Try again later')), 503
