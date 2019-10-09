@@ -121,6 +121,7 @@ def provider_registration():
     uf = post_data["uf"]
     number = post_data["number"]
     user_id = post_data["user_id"]
+    provider_categories = post_data["categories"] #TODO: Use the received categories to reg. provider categories at the categories service
 
     user = UserModel(minimum_price, maximum_price, bio, url_rg_photo, issuing_organ, uf, number, user_id)
 
