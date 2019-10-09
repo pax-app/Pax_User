@@ -123,10 +123,10 @@ def provider_registration():
     user_id = post_data["user_id"]
     provider_categories = post_data["categories"] #TODO: Use the received categories to reg. provider categories at the categories service
 
-    user = UserModel(minimum_price, maximum_price, bio, url_rg_photo, issuing_organ, uf, number, user_id)
+    provider = ProviderModel(minimum_price, maximum_price, bio, url_rg_photo, issuing_organ, uf, number, user_id)
 
     try:
-        user.save_to_db()
+        provider.save_to_db()
         response_object = createSuccessMessage('Provider was created')
         return jsonify(response_object), 201
     except:
