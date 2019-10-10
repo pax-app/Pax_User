@@ -108,3 +108,23 @@ class ProviderModel(db.Model):
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
+
+class Works(db.Model):
+    __tablename__ = 'works'
+
+    provider_category_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    provider_id = db.Column(db.Integer, db.ForeignKey('PROVIDER.provider_id'), primary_key=True)
+
+    def __init__(self, provider_category_id, provider_id):
+        self.provider_category_id = provider_category_id
+        self.provider_id = provider_id
+    
+    def to_json(self):
+        return {
+            'provider_category_id': self.provider_category_id,
+            'provider_id': self.provider_id
+        }
+    
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
