@@ -78,8 +78,6 @@ class ProviderModel(db.Model):
     maximum_price = db.Column(db.Float)
     bio = db.Column(db.String(500), nullable=False)
     url_rg_photo = db.Column(db.String(50), nullable=False)
-    issuing_organ = db.Column(db.String(10), nullable=False)
-    uf = db.Column(db.String(2), nullable=False)
     number = db.Column(db.BigInteger)
     user_id = db.Column(db.Integer, db.ForeignKey('USER.user_id'))
 
@@ -88,8 +86,6 @@ class ProviderModel(db.Model):
         self.maximum_price = maximum_price
         self.bio = bio
         self.url_rg_photo = url_rg_photo
-        self.issuing_organ = issuing_organ
-        self.uf = uf
         self.number = number
         self.user_id = user_id
                                 
@@ -99,8 +95,6 @@ class ProviderModel(db.Model):
             'maximum_price': self.maximum_price,
             'bio': self.bio,
             'url_rg_photo': self.url_rg_photo,
-            'issuing_organ': self.issuing_organ,
-            'uf': self.uf,
             'number': self.number,
             'user_id': self.user_id
         }
