@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from project.api.models import UserModel
+from project.api.models import UserModel, WorksModel
 from database import db
 from project.api import bcrypt
 from project.api.utils import authenticate
@@ -134,3 +134,17 @@ def provider_registration():
     except:
         db.session.rollback()
         return jsonify(createFailMessage('Try again later')), 503
+
+# User id validation needed at Gateway API
+@providers_categories_blueprint.route('/<provider_id>/category_provider/<provider_category_id>', methods=['DELETE'])
+def remove_category_provider_relationship(provider_id, provider_category_id):
+    works = WorksModel.query.filter_by(
+        provider_category_id=int(provider_category_id), provider_id=int(provider_id)).first()
+
+    if not works:
+        return jsonify(createFailMessage('Relationship Not Found')), 404
+
+    db.session.delete(works)
+    db.session.commit()
+
+    return jsonify(createSuccessMessage('Relationship deleted!')), 200

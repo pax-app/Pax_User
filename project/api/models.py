@@ -109,7 +109,7 @@ class ProviderModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-class Works(db.Model):
+class WorksModel(db.Model):
     __tablename__ = 'works'
 
     provider_category_id = db.Column(db.Integer, primary_key=True, nullable=False)
