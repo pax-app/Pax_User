@@ -119,13 +119,11 @@ def provider_registration():
     maximum_price = post_data["maximum_price"]
     bio = post_data["bio"]
     url_rg_photo = post_data["url_rg_photo"]
-    issuing_organ = post_data["issuing_organ"]
-    uf = post_data["uf"]
     number = post_data["number"]
     user_id = post_data["user_id"]
     provider_categories = post_data["categories"] #TODO: Use the received categories to reg. provider categories at the categories service
 
-    provider = ProviderModel(minimum_price, maximum_price, bio, url_rg_photo, issuing_organ, uf, number, user_id)
+    provider = ProviderModel(minimum_price, maximum_price, bio, url_rg_photo, number, user_id)
 
     try:
         provider.save_to_db()
