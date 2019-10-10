@@ -6,6 +6,8 @@ from project.api.utils import authenticate
 
 users_blueprint = Blueprint('user', __name__)
 
+providers_categories_blueprint = Blueprint('provider_category', __name__)
+
 
 def createFailMessage(message):
     response_object = {
