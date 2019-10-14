@@ -1,3 +1,4 @@
+import requests
 from flask import request, jsonify, Blueprint
 from project.api.models import UserModel, WorksModel, ProviderModel
 from database import db
@@ -121,9 +122,11 @@ def provider_registration():
     url_rg_photo = post_data["url_rg_photo"]
     number = post_data["number"]
     user_id = post_data["user_id"]
-    provider_categories = post_data["categories"] #TODO: Use the received categories to reg. provider categories at the categories service
+    # TODO: Use the received categories to reg. provider categories at the categories service
+    provider_categories = post_data["categories"]
 
-    provider = ProviderModel(minimum_price, maximum_price, bio, url_rg_photo, number, user_id)
+    provider = ProviderModel(minimum_price, maximum_price,
+                             bio, url_rg_photo, number, user_id)
 
     try:
         provider.save_to_db()
@@ -147,29 +150,31 @@ def remove_category_provider_relationship(provider_id, provider_category_id):
 
     return jsonify(createSuccessMessage('Relationship deleted!')), 200
 
+
 @providers_categories_blueprint.route('/provider_by_category/<provider_category_id>', methods=['GET'])
 def get_providers_by_category(provider_category_id):
-    
-    #Getting providers in the specific category
-    providers = [PROVIDERS.to_json() for PROVIDERS in WorksModel.query.filter_by(provider_category_id=(provider_category_id))]
-    
-    #Getting info of the selected providers
-    providers_info = [PROVIDERS_INFO.to_json() for PROVIDERS_INFO in ProviderModel.query.filter(ProviderModel.provider_id.in_([provider['provider_id'] for provider in providers]))]
-    
-    #Getting the name of selected providers
-    provider_names = [PROVIDER_NAMES.to_json() for PROVIDER_NAMES in UserModel.query.filter(UserModel.user_id.in_([provider_info['user_id'] for provider_info in providers_info]))]
-    #TODO:Convert this two queries to a join on the foreign key user_id, so that the while loop is no longer necessary  
-    
-    #Adding the provider's name field to provider's info returned
-    
+
+    # Getting providers in the specific category
+    providers = [PROVIDERS.to_json() for PROVIDERS in WorksModel.query.filter_by(
+        provider_category_id=(provider_category_id))]
+
+    # Getting info of the selected providers
+    providers_info = [PROVIDERS_INFO.to_json() for PROVIDERS_INFO in ProviderModel.query.filter(
+        ProviderModel.provider_id.in_([provider['provider_id'] for provider in providers]))]
+
+    # Getting the name of selected providers
+    provider_names = [PROVIDER_NAMES.to_json() for PROVIDER_NAMES in UserModel.query.filter(
+        UserModel.user_id.in_([provider_info['user_id'] for provider_info in providers_info]))]
+    # TODO:Convert this two queries to a join on the foreign key user_id, so that the while loop is no longer necessary
+
+    # Adding the provider's name field to provider's info returned
+
     count = 0
-    while(count<len(providers_info)):
-    
-      providers_info[count]['name']=provider_names[count]['name']
+    while(count < len(providers_info)):
 
-      count += 1
+        providers_info[count]['name'] = provider_names[count]['name']
 
-
+        count += 1
 
     if not providers:
         response = {
@@ -179,3 +184,25 @@ def get_providers_by_category(provider_category_id):
         return jsonify(response), 404
 
     return jsonify(providers_info), 200
+
+
+@providers_categories_blueprint.route('/review_order/<int:provider_category_id>', methods=['GET'])
+def order_providers_by_review(provider_category_id):
+
+    works = WorksModel.query.filter_by(
+        provider_category_id=int(provider_category_id)).all()
+
+    if not works:
+        return jsonify(createFailMessage('Relationship not found')), 404
+
+    provider_reviews = {}
+
+    for relatioship in works:
+        provider_reviews[relatioship.provider_id] = 0.0
+
+    for provider_id in provider_reviews:
+        reviews_response = requests.get(
+            'http://localhost:5004' + '/service_reviews/average/{}'.format(int(provider_id)))
+        provider_reviews[provider_id] = reviews_response.provider_service_review_average
+
+    return jsonify(provider_reviews), 200
