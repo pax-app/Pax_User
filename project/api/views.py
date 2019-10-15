@@ -200,9 +200,15 @@ def order_providers_by_review(provider_category_id):
     for relatioship in works:
         provider_reviews[relatioship.provider_id] = 0.0
 
-    for provider_id in provider_reviews:
-        reviews_response = requests.get(
-            'http://localhost:5004' + '/service_reviews/average/{}'.format(int(provider_id)))
-        provider_reviews[provider_id] = reviews_response.provider_service_review_average
+    try:
+        for provider_id in provider_reviews:
+            reviews_response = requests.get(
+                'http://172.22.0.1:5004/service_reviews/average/{}'.format(provider_id))
+            if not reviews_response:
+                return jsonify('Inexistent id in review service'), 404
+            reviews_response = reviews_response.json()
+            provider_reviews[provider_id] = reviews_response["provider_service_review_average"]
+    except ConnectionError:
+        return jsonfiy(createFailMessage('Could not connect to review service')), 400
 
     return jsonify(provider_reviews), 200
