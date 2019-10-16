@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from project.api.models import UserModel, WorksModel
+from project.api.models import UserModel, WorksModel, ProviderModel
 from database import db
 from project.api import bcrypt
 from project.api.utils import authenticate
