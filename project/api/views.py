@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from project.api.models import UserModel, WorksModel
+from project.api.models import UserModel, WorksModel, ProviderModel
 from database import db
 from project.api import bcrypt
 from project.api.utils import authenticate
@@ -146,3 +146,36 @@ def remove_category_provider_relationship(provider_id, provider_category_id):
     db.session.commit()
 
     return jsonify(createSuccessMessage('Relationship deleted!')), 200
+
+@providers_categories_blueprint.route('/provider_by_category/<provider_category_id>', methods=['GET'])
+def get_providers_by_category(provider_category_id):
+    
+    #Getting providers in the specific category
+    providers = [PROVIDERS.to_json() for PROVIDERS in WorksModel.query.filter_by(provider_category_id=(provider_category_id))]
+    
+    #Getting info of the selected providers
+    providers_info = [PROVIDERS_INFO.to_json() for PROVIDERS_INFO in ProviderModel.query.filter(ProviderModel.provider_id.in_([provider['provider_id'] for provider in providers]))]
+    
+    #Getting the name of selected providers
+    provider_names = [PROVIDER_NAMES.to_json() for PROVIDER_NAMES in UserModel.query.filter(UserModel.user_id.in_([provider_info['user_id'] for provider_info in providers_info]))]
+    #TODO:Convert this two queries to a join on the foreign key user_id, so that the while loop is no longer necessary  
+    
+    #Adding the provider's name field to provider's info returned
+    
+    count = 0
+    while(count<len(providers_info)):
+    
+      providers_info[count]['name']=provider_names[count]['name']
+
+      count += 1
+
+
+
+    if not providers:
+        response = {
+            'status': 'failed',
+            'error': "ID Not Found"
+        }
+        return jsonify(response), 404
+
+    return jsonify(providers_info), 200

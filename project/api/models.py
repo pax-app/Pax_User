@@ -81,7 +81,7 @@ class ProviderModel(db.Model):
     number = db.Column(db.BigInteger)
     user_id = db.Column(db.Integer, db.ForeignKey('USER.user_id'))
 
-    def __init__(self, minimum_price, maximum_price, bio, url_rg_photo, issuing_organ, uf, number, user_id):
+    def __init__(self, minimum_price, maximum_price, bio, url_rg_photo, number, user_id):
         self.minimum_price = minimum_price
         self.maximum_price = maximum_price
         self.bio = bio
