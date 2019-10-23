@@ -1,8 +1,10 @@
-from database import db
+from database_singleton import Singleton
 from project.api import bcrypt
 from flask import current_app
 import datetime
 import jwt
+
+db = Singleton().database_connection()
 
 
 class UserModel(db.Model):
