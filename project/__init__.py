@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from project.api.views import users_blueprint
+from project.api.views import users_blueprint, providers_categories_blueprint
 from project.api import bcrypt
 from database import db, migrate
 
@@ -19,5 +19,6 @@ def create_app(script_info=None):
 
     # register blueprints
     app.register_blueprint(users_blueprint)
+    app.register_blueprint(providers_categories_blueprint)
 
     return app
