@@ -2,7 +2,6 @@ import requests
 from database_singleton import Singleton
 from project.api.models import ProviderModel, UserModel, WorksModel
 from flask import request, jsonify
-from project.api.views import createFailMessage, createSuccessMessage
 
 db = Singleton().database_connection()
 
@@ -63,3 +62,18 @@ class Utils:
 
         except ConnectionError:
             return jsonfiy(createFailMessage('Could not connect to review service')), 400
+
+    def createFailMessage(self, message):
+        response_object = {
+            'status': 'fail',
+            'message': '{}'.format(message)
+        }
+        return response_object
+
+
+    def createSuccessMessage(self, message):
+        response_object = {
+            'status': 'success',
+            'message': '{}'.format(message)
+        }
+        return response_object
