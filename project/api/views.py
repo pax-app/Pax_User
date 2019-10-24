@@ -3,7 +3,8 @@ from flask import request, jsonify, Blueprint
 from project.api.models import UserModel, WorksModel, ProviderModel
 from database_singleton import Singleton
 from project.api import bcrypt
-from project.api.auth_utils import authenticate
+from project.api.utils.auth_utils import authenticate
+from project.api.utils.creation_utils import DatabaseQueries, Utils
 
 users_blueprint = Blueprint('user', __name__)
 providers_categories_blueprint = Blueprint('provider_category', __name__)
@@ -188,28 +189,9 @@ def get_providers_by_category(provider_category_id):
 
 @providers_categories_blueprint.route('/provider_by_category/min_price/<provider_category_id>', methods=['GET'])
 def get_providers_by_category_min_price(provider_category_id):
-
-    # Getting providers in the specific category
-    providers = [PROVIDERS.to_json() for PROVIDERS in WorksModel.query.filter_by(
-        provider_category_id=(provider_category_id))]
-
-    # Getting info of the selected providers
-    providers_info = [PROVIDERS_INFO.to_json() for PROVIDERS_INFO in ProviderModel.query.filter(
-        ProviderModel.provider_id.in_([provider['provider_id'] for provider in providers]))]
-
-    # Getting the name of selected providers
-    provider_names = [PROVIDER_NAMES.to_json() for PROVIDER_NAMES in UserModel.query.filter(
-        UserModel.user_id.in_([provider_info['user_id'] for provider_info in providers_info]))]
-    # TODO:Convert this two queries to a join on the foreign key user_id, so that the while loop is no longer necessary
-
+    utils = Utils()
     # Adding the provider's name field to provider's info returned
-
-    count = 0
-    while(count < len(providers_info)):
-
-        providers_info[count]['name'] = provider_names[count]['name']
-
-        count += 1
+    providers_info = utils.append_username_to_provider(providers_info)
 
     providers_info = sorted(
         providers_info, key=lambda element: element['minimum_price'])
