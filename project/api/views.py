@@ -3,7 +3,7 @@ from flask import request, jsonify, Blueprint
 from project.api.models import UserModel, WorksModel, ProviderModel
 from database_singleton import Singleton
 from project.api import bcrypt
-from project.api.utils import authenticate
+from project.api.auth_utils import authenticate
 
 users_blueprint = Blueprint('user', __name__)
 providers_categories_blueprint = Blueprint('provider_category', __name__)
