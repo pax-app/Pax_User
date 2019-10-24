@@ -1,5 +1,8 @@
+import requests
 from database_singleton import Singleton
 from project.api.models import ProviderModel, UserModel, WorksModel
+from flask import request, jsonify
+from project.api.views import createFailMessage, createSuccessMessage
 
 db = Singleton().database_connection()
 
@@ -44,3 +47,19 @@ class Utils:
             count += 1
 
         return providers_info
+
+    def append_review_to_provider(self, providers_info):
+        try:
+            for provider in providers_info:
+                provider_id = int(provider['provider_id'])
+                reviews_response = requests.get(
+                    'http://172.22.0.1:5004/service_reviews/average/{}'.format(provider_id))
+                if not reviews_response:
+                    return jsonify('Inexistent id in review service'), 404
+                reviews_response = reviews_response.json()
+                if provider['provider_id'] == provider_id:
+                    provider['reviews_average'] = reviews_response["provider_service_review_average"]
+            return providers_info
+
+        except ConnectionError:
+            return jsonfiy(createFailMessage('Could not connect to review service')), 400
