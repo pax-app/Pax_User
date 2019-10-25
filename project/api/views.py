@@ -158,7 +158,7 @@ def get_providers_by_category_min_price(provider_category_id):
 def order_providers_by_review(provider_category_id):
     utils = Utils()
     # Adding the provider's name field to provider's info returned
-    providers_info = utils.append_username_to_provider(providers_info)
+    providers_info = utils.append_username_to_provider(provider_category_id)
     providers_info = utils.append_review_to_provider(providers_info)
     context = Context(ReviewStrategy())
     providers_info = context.execute_sorting(provider_category_id)
