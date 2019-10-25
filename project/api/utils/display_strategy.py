@@ -31,26 +31,13 @@ class Strategy(ABC):
 class ReviewStrategy(Strategy):
     def sort_providers(self, data: dict) -> dict:
         data = Utils().append_review_to_provider(data)
-        providers_info = sorted(data, key=lambda element: element['reviews_average'])
-        return sorted(data)
+        providers_info = sorted(
+            data, key=lambda element: element['reviews_average'])
+        return providers_info
 
 
 class PriceStrategy(Strategy):
     def sort_providers(self, data: dict) -> dict:
-        providers_info = sorted(data, key=lambda element: element['minimum_price'])
+        providers_info = sorted(
+            data, key=lambda element: element['minimum_price'])
         return providers_info
-
-
-if __name__ == "__main__":
-    # The client code picks a concrete strategy and passes it to the context.
-    # The client should be aware of the differences between strategies in order
-    # to make the right choice.
-
-    context = Context(ConcreteStrategyA())
-    print("Client: Strategy is set to normal sorting.")
-    context.execute_sorting()
-    print()
-
-    print("Client: Strategy is set to reverse sorting.")
-    context.strategy = ConcreteStrategyB()
-    context.execute_sorting()
