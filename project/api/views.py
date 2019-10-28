@@ -167,6 +167,15 @@ def add_address():
         db.session.rollback()
         return jsonify(Utils().createFailMessage('Try again later')), 503
 
+
+@users_blueprint.route('/get_addresses', methods=['GET'])
+def get_address():
+    user_id = request.args.get('user_id')
+    addresses = AddressModel.query.join(
+        LivesModel, LivesModel.address_id == AddressModel.address_id).filter_by(user_id=user_id)
+
+    return jsonify([row.to_json() for row in addresses]), 200
+
 # User id validation needed at Gateway API
 @providers_categories_blueprint.route('/<provider_id>/category_provider/<provider_category_id>', methods=['DELETE'])
 def remove_category_provider_relationship(provider_id, provider_category_id):
