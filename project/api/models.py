@@ -155,6 +155,7 @@ class AddressModel(db.Model):
 
     def to_json(self):
         return{
+            'address_id': self.address_id,
             'street': self.street,
             'neighborhood': self.neighborhood,
             'number': self.number,
