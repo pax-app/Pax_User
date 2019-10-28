@@ -1,6 +1,6 @@
 import requests
 from flask import request, jsonify, Blueprint
-from project.api.models import UserModel, WorksModel, ProviderModel
+from project.api.models import UserModel, WorksModel, ProviderModel, AddressModel, LivesModel
 from database_singleton import Singleton
 from project.api import bcrypt
 from project.api.utils.auth_utils import authenticate
@@ -122,6 +122,60 @@ def provider_registration():
         db.session.rollback()
         return jsonify(Utils().createFailMessage('Try again later')), 503
 
+
+@users_blueprint.route('/add_address', methods=['POST'])
+def add_address():
+    post_data = request.json
+
+    if(not request.is_json or not post_data):
+        return jsonify(Utils().createFailMessage("Invalid Payload")), 400
+
+    user_id = post_data["user_id"]
+    street = post_data["street"]
+    neighborhood = post_data["neighborhood"]
+    number = post_data["number"]
+    city = post_data["city"]
+    cep = post_data["cep"]
+    state = post_data["state"]
+
+    try:
+        complement = post_data["complement"]
+    except:
+        complement = None
+
+    try:
+        reference_point = post_data["reference_point"]
+    except:
+        reference_point = None
+
+    address = AddressModel(street, neighborhood, number,
+                           complement, city, cep, state, reference_point)
+
+    try:
+        address.save_to_db()
+    except:
+        db.session.rollback()
+        return jsonify(Utils().createFailMessage('Try again later')), 503
+
+    lives = LivesModel(user_id, address.address_id)
+
+    try:
+        lives.save_to_db()
+        response_object = Utils().createSuccessMessage('Address registered')
+        return jsonify(response_object), 201
+    except:
+        db.session.rollback()
+        return jsonify(Utils().createFailMessage('Try again later')), 503
+
+
+@users_blueprint.route('/get_addresses', methods=['GET'])
+def get_address():
+    user_id = request.args.get('user_id')
+    addresses = AddressModel.query.join(
+        LivesModel, LivesModel.address_id == AddressModel.address_id).filter_by(user_id=user_id)
+
+    return jsonify([row.to_json() for row in addresses]), 200
+
 # User id validation needed at Gateway API
 @providers_categories_blueprint.route('/<provider_id>/category_provider/<provider_category_id>', methods=['DELETE'])
 def remove_category_provider_relationship(provider_id, provider_category_id):
@@ -136,12 +190,13 @@ def remove_category_provider_relationship(provider_id, provider_category_id):
 
     return jsonify(Utils().createSuccessMessage('Relationship deleted!')), 200
 
+
 @providers_categories_blueprint.route('/provider_by_category/min_price/<provider_category_id>', methods=['GET'])
 def get_providers_by_category_min_price(provider_category_id):
     utils = Utils()
-        # Adding the provider's name field to provider's info returned
+    # Adding the provider's name field to provider's info returned
     providers_info = utils.append_username_to_provider(provider_category_id)
-    
+
     if not providers_info:
         response = {
             'status': 'failed',
