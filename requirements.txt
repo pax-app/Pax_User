@@ -10,3 +10,4 @@ gunicorn==19.8.1
 flask-bcrypt==0.7.1
 pyjwt==1.6.4
 flask-migrate==2.2.0
+requests

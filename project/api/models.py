@@ -1,8 +1,10 @@
-from database import db
+from database_singleton import Singleton
 from project.api import bcrypt
 from flask import current_app
 import datetime
 import jwt
+
+db = Singleton().database_connection()
 
 
 class UserModel(db.Model):
@@ -88,9 +90,10 @@ class ProviderModel(db.Model):
         self.url_rg_photo = url_rg_photo
         self.number = number
         self.user_id = user_id
-                                
+
     def to_json(self):
         return{
+            'provider_id': self.provider_id,
             'minimum_price': self.minimum_price,
             'maximum_price': self.maximum_price,
             'bio': self.bio,
@@ -99,26 +102,33 @@ class ProviderModel(db.Model):
             'user_id': self.user_id
         }
 
+    @classmethod
+    def find_provider(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).first()
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
 
+
 class WorksModel(db.Model):
     __tablename__ = 'works'
 
-    provider_category_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    provider_id = db.Column(db.Integer, db.ForeignKey('PROVIDER.provider_id'), primary_key=True)
+    provider_category_id = db.Column(
+        db.Integer, primary_key=True, nullable=False)
+    provider_id = db.Column(db.Integer, db.ForeignKey(
+        'PROVIDER.provider_id'), primary_key=True)
 
     def __init__(self, provider_category_id, provider_id):
         self.provider_category_id = provider_category_id
         self.provider_id = provider_id
-    
+
     def to_json(self):
         return {
             'provider_category_id': self.provider_category_id,
             'provider_id': self.provider_id
         }
-    
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
