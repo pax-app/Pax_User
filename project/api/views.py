@@ -6,6 +6,7 @@ from project.api import bcrypt
 from project.api.utils.auth_utils import authenticate
 from project.api.utils.creation_utils import DatabaseQueries, Utils
 from project.api.utils.display_strategy import Context, ReviewStrategy, PriceStrategy
+from sqlalchemy import and_
 
 users_blueprint = Blueprint('user', __name__)
 providers_categories_blueprint = Blueprint('provider_category', __name__)
@@ -172,7 +173,7 @@ def add_address():
 def get_address():
     user_id = request.args.get('user_id')
     addresses = AddressModel.query.join(
-        LivesModel, LivesModel.address_id == AddressModel.address_id).filter_by(user_id=user_id)
+        LivesModel, and_(LivesModel.user_id == user_id, LivesModel.address_id == AddressModel.address_id))
 
     return jsonify([row.to_json() for row in addresses]), 200
 
