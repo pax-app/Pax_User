@@ -168,3 +168,26 @@ class AddressModel(db.Model):
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
+
+
+class LivesModel(db.Model):
+    __tablename__ = 'lives'
+
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'USER.user_id'), primary_key=True, nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey(
+        'ADDRESS.address_id'), primary_key=True, nullable=False)
+
+    def __init__(self, user_id, address_id):
+        self.user_id = user_id
+        self.address_id = address_id
+
+    def to_json(self):
+        return{
+            'user_id': self.user_id,
+            'address_id': self.address_id
+        }
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
