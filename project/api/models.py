@@ -132,3 +132,67 @@ class WorksModel(db.Model):
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
+
+
+class AddressModel(db.Model):
+    __tablename__ = 'ADDRESS'
+
+    address_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    street = db.Column(db.String(30), nullable=False)
+    neighborhood = db.Column(db.String(30), nullable=False)
+    number = db.Column(db.Integer, nullable=False)
+    complement = db.Column(db.String(50), nullable=True)
+    city = db.Column(db.String(20), nullable=False)
+    cep = db.Column(db.Integer, nullable=False)
+    state = db.Column(db.String(2), nullable=False)
+    reference_point = db.Column(db.String(50), nullable=True)
+
+    def __init__(self, street, neighborhood, number, complement, city, cep, state, reference_point):
+        self.street = street
+        self.neighborhood = neighborhood
+        self.number = number
+        self.complement = complement
+        self.city = city
+        self.cep = cep
+        self.state = state
+        self.reference_point = reference_point
+
+    def to_json(self):
+        return{
+            'address_id': self.address_id,
+            'street': self.street,
+            'neighborhood': self.neighborhood,
+            'number': self.number,
+            'complement': self.complement,
+            'city': self.city,
+            'cep': self.cep,
+            'state': self.state,
+            'reference_point': self.reference_point
+        }
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class LivesModel(db.Model):
+    __tablename__ = 'lives'
+
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'USER.user_id'), primary_key=True, nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey(
+        'ADDRESS.address_id'), primary_key=True, nullable=False)
+
+    def __init__(self, user_id, address_id):
+        self.user_id = user_id
+        self.address_id = address_id
+
+    def to_json(self):
+        return{
+            'user_id': self.user_id,
+            'address_id': self.address_id
+        }
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
