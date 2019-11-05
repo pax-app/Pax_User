@@ -102,6 +102,10 @@ class ProviderModel(db.Model):
             'user_id': self.user_id
         }
 
+    @classmethod
+    def find_provider(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).first()
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

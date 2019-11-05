@@ -34,9 +34,13 @@ def user_registration():
         user.save_to_db()
         auth_token = user.encode_auth_token(user.user_id)
         response_object = Utils().createSuccessMessage('User was created')
+        user = UserModel.find_by_email(email)
+        provider = ProviderModel.find_provider(user.user_id)
         response_object["auth_token"] = auth_token.decode()
         response_object["name"] = name
         response_object["email"] = email
+        response_object["id"] = user.user_id
+        response_object["is_provider"] = provider is not None
         return jsonify(response_object), 201
     except:
         db.session.rollback()
@@ -61,16 +65,21 @@ def user_login():
             return jsonify(Utils().createFailMessage('User {} doesn\'t exist'.format(email))), 404
 
         if current_user and bcrypt.check_password_hash(current_user.password, password):
+            provider = ProviderModel.find_provider(current_user.user_id)
             auth_token = current_user.encode_auth_token(current_user.user_id)
             response_object = Utils().createSuccessMessage('Successfully logged in.')
             response_object["auth_token"] = auth_token.decode()
             response_object["name"] = current_user.name
             response_object["email"] = current_user.email
+            response_object["id"] = current_user.user_id
+            response_object["is_provider"] = provider is not None
+
             return jsonify(response_object), 200
         else:
             return jsonify(Utils().createFailMessage('Wrong Credentials')), 401
-    except:
-        return jsonify(Utils().createFailMessage("Try again")), 500
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify(Utils().createFailMessage(ex)), 500
 
 # Logout for access
 @users_blueprint.route('/auth/logout', methods=['GET'])
@@ -97,7 +106,8 @@ def get_user_status(resp):
 
 # Provider Registration Route
 @users_blueprint.route('/provider_registration', methods=['POST'])
-def provider_registration():
+@authenticate
+def provider_registration(resp):
     post_data = request.json
 
     if(not request.is_json or not post_data):
