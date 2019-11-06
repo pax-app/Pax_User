@@ -7,6 +7,7 @@ from project.api.utils.auth_utils import authenticate
 from project.api.utils.creation_utils import DatabaseQueries, Utils
 from project.api.utils.display_strategy import Context, ReviewStrategy, PriceStrategy
 from sqlalchemy import and_
+import json
 
 users_blueprint = Blueprint('user', __name__)
 providers_categories_blueprint = Blueprint('provider_category', __name__)
@@ -20,6 +21,7 @@ def user_registration():
     if(not request.is_json or not post_data):
         return jsonify(Utils().createFailMessage("Invalid Payload")), 400
 
+    db.session.rollback()
     name = post_data["name"]
     email = post_data["email"]
     cpf = post_data["cpf"]
@@ -112,15 +114,15 @@ def provider_registration(resp):
 
     if(not request.is_json or not post_data):
         return jsonify(Utils().createFailMessage("Invalid Payload")), 400
-
+    db.session.rollback()
     minimum_price = post_data["minimum_price"]
     maximum_price = post_data["maximum_price"]
     bio = post_data["bio"]
     url_rg_photo = post_data["url_rg_photo"]
     number = post_data["number"]
     user_id = post_data["user_id"]
-    # TODO: Use the received categories to reg. provider categories at the categories service
     provider_categories = post_data["categories"]
+    categories = json.loads(provider_categories)
 
     provider = ProviderModel(minimum_price, maximum_price,
                              bio, url_rg_photo, number, user_id)
@@ -128,8 +130,13 @@ def provider_registration(resp):
     try:
         provider.save_to_db()
         response_object = Utils().createSuccessMessage('Provider was created')
-        return jsonify(response_object), 201
-    except:
+        provider = ProviderModel.find_provider(user_id)
+        for category in categories:
+            work = WorksModel(category["id"], provider.provider_id)
+            work.save_to_db()
+
+        return jsonify(response_object), 200
+    except Exception as e:
         db.session.rollback()
         return jsonify(Utils().createFailMessage('Try again later')), 503
 
