@@ -1,12 +1,12 @@
-import requests
-from flask import request, jsonify, Blueprint
 from project.api.models import UserModel, WorksModel, ProviderModel, AddressModel, LivesModel
+from project.api.utils.display_strategy import Context, ReviewStrategy, PriceStrategy
+from project.api.utils.creation_utils import DatabaseQueries, Utils
+from project.api.utils.auth_utils import authenticate
+from flask import request, jsonify, Blueprint
 from database_singleton import Singleton
 from project.api import bcrypt
-from project.api.utils.auth_utils import authenticate
-from project.api.utils.creation_utils import DatabaseQueries, Utils
-from project.api.utils.display_strategy import Context, ReviewStrategy, PriceStrategy
 from sqlalchemy import and_
+import requests
 
 users_blueprint = Blueprint('user', __name__)
 providers_categories_blueprint = Blueprint('provider_category', __name__)
@@ -179,17 +179,15 @@ def add_address():
         return jsonify(Utils().createFailMessage('Try again later')), 503
 
 
-@users_blueprint.route('/get_address', methods=['GET'])
-def get_address():
-    address_id = request.args.get('address_id')
+@users_blueprint.route('/get_address/<address_id>', methods=['GET'])
+def get_address(address_id):
     row = AddressModel.query.filter_by(address_id=address_id).all()
 
     return jsonify([address.to_json() for address in row]), 200
 
 
-@users_blueprint.route('/get_addresses', methods=['GET'])
-def get_addresses():
-    user_id = request.args.get('user_id')
+@users_blueprint.route('/get_addresses/<user_id>', methods=['GET'])
+def get_addresses(user_id):
     addresses = AddressModel.query.join(
         LivesModel, and_(LivesModel.user_id == user_id, LivesModel.address_id == AddressModel.address_id))
 
