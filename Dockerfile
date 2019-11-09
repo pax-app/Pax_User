@@ -21,4 +21,4 @@ COPY . /app
 
 
 # run server
-CMD python manage.py run -h 0.0.0.0
+CMD ["gunicorn","project:create_app()"]
