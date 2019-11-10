@@ -119,10 +119,19 @@ def provider_registration(resp):
     maximum_price = post_data["maximum_price"]
     bio = post_data["bio"]
     url_rg_photo = post_data["url_rg_photo"]
+    url_avatar = post_data["url_avatar"]
     number = post_data["number"]
     user_id = post_data["user_id"]
     provider_categories = post_data["categories"]
     categories = json.loads(provider_categories)
+
+    user = UserModel.find(user_id)
+    try:
+        user.url_avatar = url_avatar
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(Utils().createFailMessage('Error saving picture')), 500
 
     provider = ProviderModel(minimum_price, maximum_price,
                              bio, url_rg_photo, number, user_id)

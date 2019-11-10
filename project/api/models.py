@@ -39,6 +39,10 @@ class UserModel(db.Model):
         db.session.commit()
 
     @classmethod
+    def find(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).first()
+
+    @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
 
@@ -178,8 +182,8 @@ class LivesModel(db.Model):
 class WorksModel(db.Model):
     __tablename__ = 'works'
 
-    provider_category_id = db.Column(db.Integer, db.ForeignKey(
-        'PROVIDER_CATEGORY.provider_category_id'), nullable=False, primary_key=True)
+    provider_category_id = db.Column(
+        db.Integer, nullable=False, primary_key=True)
     provider_id = db.Column(db.Integer, db.ForeignKey(
         'PROVIDER.provider_id'), nullable=False, primary_key=True)
 
@@ -196,43 +200,3 @@ class WorksModel(db.Model):
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
-
-
-class Category():
-
-    def to_json(self):
-        pass
-
-
-class ProviderCategory(db.Model, Category):
-    __tablename__ = 'PROVIDER_CATEGORY'
-
-    provider_category_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
-    general_category_id = db.Column(
-        db.Integer, db.ForeignKey('general_category.id'))
-
-    def to_json(self, category):
-
-        return {
-            'generalId': category.general_category_id,
-            'id': category.provider_category_id,
-            'name': category.name,
-        }
-
-
-class GeneralCategory(db.Model, Category):
-
-    __tablename__ = 'GENERAL_CATEGORY'
-
-    general_category_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
-
-    def to_json(self, category):
-
-        return {
-            'id': category.general_category_id,
-            'name': category.name,
-        }
