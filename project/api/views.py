@@ -191,7 +191,7 @@ def get_addresses(user_id):
     addresses = AddressModel.query.join(
         LivesModel, and_(LivesModel.user_id == user_id, LivesModel.address_id == AddressModel.address_id))
 
-    return jsonify([row.to_json() for row in addresses]), 200
+    return jsonify([row.to_json() for row in addresses][0]), 200
 
 # User id validation needed at Gateway API
 @providers_categories_blueprint.route('/<provider_id>/category_provider/<provider_category_id>', methods=['DELETE'])
