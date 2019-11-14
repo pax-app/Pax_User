@@ -179,6 +179,23 @@ def add_address():
         return jsonify(Utils().createFailMessage('Try again later')), 503
 
 
+@users_blueprint.route('/get_user_info/<user_type>/<id>', methods=['GET'])
+def get_user_info(user_type, id):
+    user_id = id
+
+    if(user_type == 'provider'):
+        user_id = ProviderModel.query.filter_by(provider_id=id).first().user_id
+
+    row = UserModel.query.filter_by(user_id=user_id).first()
+
+    response = {
+        "username": row.name,
+        "url_avatar": row.url_avatar
+    }
+
+    return jsonify(response)
+
+
 @users_blueprint.route('/get_address/<address_id>', methods=['GET'])
 def get_address(address_id):
     row = AddressModel.query.filter_by(address_id=address_id).all()
