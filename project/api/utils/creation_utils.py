@@ -32,7 +32,7 @@ class DatabaseQueries:
 
 
 class Utils:
-    def append_username_to_provider(self, provider_category_id):
+    def append_user_infos_to_provider(self, provider_category_id):
         database_queries = DatabaseQueries()
         providers_category = database_queries.get_providers_by_category(
             provider_category_id)
@@ -43,6 +43,7 @@ class Utils:
         count = 0
         while(count < len(providers_info)):
             providers_info[count]['name'] = provider_names[count]['name']
+            providers_info[count]['url_avatar'] = provider_names[count]['url_avatar']
             count += 1
 
         return providers_info

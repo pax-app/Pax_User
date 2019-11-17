@@ -17,7 +17,7 @@ class Context():
         self._strategy = strategy
 
     def execute_sorting(self, provider_category_id) -> dict:
-        providers_info = Utils().append_username_to_provider(provider_category_id)
+        providers_info = Utils().append_user_infos_to_provider(provider_category_id)
         result = self._strategy.sort_providers(providers_info)
         return result
 

@@ -106,6 +106,14 @@ class ProviderModel(db.Model):
             'user_id': self.user_id
         }
 
+    def to_display(self):
+        return {
+            'provider_id': self.provider_id,
+            'minimum_price': self.minimum_price,
+            'maximum_price': self.maximum_price,
+            'bio': self.bio
+        }
+
     @classmethod
     def find_provider(cls, user_id):
         return cls.query.filter_by(user_id=user_id).first()
