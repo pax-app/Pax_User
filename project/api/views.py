@@ -21,7 +21,6 @@ def user_registration():
     if(not request.is_json or not post_data):
         return jsonify(Utils().createFailMessage("Invalid Payload")), 400
 
-    db.session.rollback()
     name = post_data["name"]
     email = post_data["email"]
     cpf = post_data["cpf"]
