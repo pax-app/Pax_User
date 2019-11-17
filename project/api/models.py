@@ -39,6 +39,10 @@ class UserModel(db.Model):
         db.session.commit()
 
     @classmethod
+    def find(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).first()
+
+    @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
 
@@ -111,29 +115,6 @@ class ProviderModel(db.Model):
         db.session.commit()
 
 
-class WorksModel(db.Model):
-    __tablename__ = 'works'
-
-    provider_category_id = db.Column(
-        db.Integer, primary_key=True, nullable=False)
-    provider_id = db.Column(db.Integer, db.ForeignKey(
-        'PROVIDER.provider_id'), primary_key=True)
-
-    def __init__(self, provider_category_id, provider_id):
-        self.provider_category_id = provider_category_id
-        self.provider_id = provider_id
-
-    def to_json(self):
-        return {
-            'provider_category_id': self.provider_category_id,
-            'provider_id': self.provider_id
-        }
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
-
-
 class AddressModel(db.Model):
     __tablename__ = 'ADDRESS'
 
@@ -191,6 +172,29 @@ class LivesModel(db.Model):
         return{
             'user_id': self.user_id,
             'address_id': self.address_id
+        }
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class WorksModel(db.Model):
+    __tablename__ = 'works'
+
+    provider_category_id = db.Column(
+        db.Integer, nullable=False, primary_key=True)
+    provider_id = db.Column(db.Integer, db.ForeignKey(
+        'PROVIDER.provider_id'), nullable=False, primary_key=True)
+
+    def __init__(self, provider_category_id, provider_id):
+        self.provider_category_id = provider_category_id
+        self.provider_id = provider_id
+
+    def to_json(self):
+        return{
+            'provider_category_id': self.provider_category_id,
+            'provider_id': self.provider_id
         }
 
     def save_to_db(self):

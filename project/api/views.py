@@ -6,6 +6,7 @@ from flask import request, jsonify, Blueprint
 from database_singleton import Singleton
 from project.api import bcrypt
 from sqlalchemy import and_
+import json
 import requests
 
 users_blueprint = Blueprint('user', __name__)
@@ -20,6 +21,7 @@ def user_registration():
     if(not request.is_json or not post_data):
         return jsonify(Utils().createFailMessage("Invalid Payload")), 400
 
+    db.session.rollback()
     name = post_data["name"]
     email = post_data["email"]
     cpf = post_data["cpf"]
@@ -112,15 +114,24 @@ def provider_registration(resp):
 
     if(not request.is_json or not post_data):
         return jsonify(Utils().createFailMessage("Invalid Payload")), 400
-
+    db.session.rollback()
     minimum_price = post_data["minimum_price"]
     maximum_price = post_data["maximum_price"]
     bio = post_data["bio"]
     url_rg_photo = post_data["url_rg_photo"]
+    url_avatar = post_data["url_avatar"]
     number = post_data["number"]
     user_id = post_data["user_id"]
-    # TODO: Use the received categories to reg. provider categories at the categories service
     provider_categories = post_data["categories"]
+    categories = json.loads(provider_categories)
+
+    user = UserModel.find(user_id)
+    try:
+        user.url_avatar = url_avatar
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(Utils().createFailMessage('Error saving picture')), 500
 
     provider = ProviderModel(minimum_price, maximum_price,
                              bio, url_rg_photo, number, user_id)
@@ -128,8 +139,13 @@ def provider_registration(resp):
     try:
         provider.save_to_db()
         response_object = Utils().createSuccessMessage('Provider was created')
-        return jsonify(response_object), 201
-    except:
+        provider = ProviderModel.find_provider(user_id)
+        for category in categories:
+            work = WorksModel(category["id"], provider.provider_id)
+            work.save_to_db()
+
+        return jsonify(response_object), 200
+    except Exception as e:
         db.session.rollback()
         return jsonify(Utils().createFailMessage('Try again later')), 503
 
