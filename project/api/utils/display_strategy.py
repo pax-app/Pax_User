@@ -29,10 +29,10 @@ class Strategy(ABC):
 
 
 class ReviewStrategy(Strategy):
-    def sort_providers(self, data: dict) -> dict:
+    def sort_providers(self, data: list) -> list:
         data = Utils().append_review_to_provider(data)
         providers_info = sorted(
-            data, key=lambda element: element['reviews_average'])
+            data, key=lambda element: element['reviews_average'], reverse=True)
         return providers_info
 
 
