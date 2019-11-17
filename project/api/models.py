@@ -84,15 +84,15 @@ class ProviderModel(db.Model):
     maximum_price = db.Column(db.Float)
     bio = db.Column(db.String(500), nullable=False)
     url_rg_photo = db.Column(db.String(50), nullable=False)
-    number = db.Column(db.BigInteger)
+    rg_number = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('USER.user_id'))
 
-    def __init__(self, minimum_price, maximum_price, bio, url_rg_photo, number, user_id):
+    def __init__(self, minimum_price, maximum_price, bio, url_rg_photo, rg_number, user_id):
         self.minimum_price = minimum_price
         self.maximum_price = maximum_price
         self.bio = bio
         self.url_rg_photo = url_rg_photo
-        self.number = number
+        self.rg_number = rg_number
         self.user_id = user_id
 
     def to_json(self):
@@ -102,16 +102,8 @@ class ProviderModel(db.Model):
             'maximum_price': self.maximum_price,
             'bio': self.bio,
             'url_rg_photo': self.url_rg_photo,
-            'number': self.number,
+            'rg_number': self.rg_number,
             'user_id': self.user_id
-        }
-
-    def to_display(self):
-        return {
-            'provider_id': self.provider_id,
-            'minimum_price': self.minimum_price,
-            'maximum_price': self.maximum_price,
-            'bio': self.bio
         }
 
     @classmethod
