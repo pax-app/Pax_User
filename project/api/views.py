@@ -44,6 +44,7 @@ def user_registration():
         response_object["id"] = user.user_id
         response_object["is_provider"] = False
         response_object["provider_id"] = None
+        response_object["url_avatar"] = None
         return jsonify(response_object), 201
     except:
         db.session.rollback()
@@ -77,6 +78,7 @@ def user_login():
             response_object["id"] = current_user.user_id
             response_object["is_provider"] = provider is not None
             response_object["provider_id"] = provider.provider_id if provider is not None else None
+            response_object["url_avatar"] = provider.url_avatar
 
             return jsonify(response_object), 200
         else:
