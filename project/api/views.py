@@ -267,8 +267,7 @@ def order_providers_by_review(provider_category_id):
     utils = Utils()
     # Adding the provider's name field to provider's info returned
     providers_info = utils.append_username_to_provider(provider_category_id)
-    providers_info = utils.append_review_to_provider(providers_info)
+    providers_with_review = utils.append_review_to_provider(providers_info)
     context = Context(ReviewStrategy())
-    providers_info = context.execute_sorting(provider_category_id)
-
-    return jsonify(providers_info), 200
+    providers = context.execute_sorting(provider_category_id)
+    return json.dumps(providers)
