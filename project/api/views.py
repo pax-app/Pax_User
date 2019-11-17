@@ -78,7 +78,7 @@ def user_login():
             response_object["id"] = current_user.user_id
             response_object["is_provider"] = provider is not None
             response_object["provider_id"] = provider.provider_id if provider is not None else None
-            response_object["url_avatar"] = provider.url_avatar
+            response_object["url_avatar"] = current_user.url_avatar
 
             return jsonify(response_object), 200
         else:
