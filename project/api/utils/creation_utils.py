@@ -52,7 +52,7 @@ class Utils:
             for provider in providers_info:
                 provider_id = int(provider['provider_id'])
                 reviews_response = requests.get(
-                    'http://172.22.0.1:5004/service_reviews/average/{}'.format(provider_id))
+                    'https://pax-gateway.herokuapp.com/api/v1/review/service_reviews/average/{}'.format(provider_id))
                 if not reviews_response:
                     return jsonify('Inexistent id in review service'), 404
                 reviews_response = reviews_response.json()
