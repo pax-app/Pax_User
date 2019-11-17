@@ -17,7 +17,7 @@ class Context():
         self._strategy = strategy
 
     def execute_sorting(self, provider_category_id) -> dict:
-        providers_info = Utils().append_username_to_provider(provider_category_id)
+        providers_info = Utils().append_user_infos_to_provider(provider_category_id)
         result = self._strategy.sort_providers(providers_info)
         return result
 
@@ -29,10 +29,10 @@ class Strategy(ABC):
 
 
 class ReviewStrategy(Strategy):
-    def sort_providers(self, data: dict) -> dict:
+    def sort_providers(self, data: list) -> list:
         data = Utils().append_review_to_provider(data)
         providers_info = sorted(
-            data, key=lambda element: element['reviews_average'])
+            data, key=lambda element: element['reviews_average'], reverse=True)
         return providers_info
 
 

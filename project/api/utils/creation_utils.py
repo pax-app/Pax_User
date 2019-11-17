@@ -32,7 +32,7 @@ class DatabaseQueries:
 
 
 class Utils:
-    def append_username_to_provider(self, provider_category_id):
+    def append_user_infos_to_provider(self, provider_category_id):
         database_queries = DatabaseQueries()
         providers_category = database_queries.get_providers_by_category(
             provider_category_id)
@@ -43,25 +43,30 @@ class Utils:
         count = 0
         while(count < len(providers_info)):
             providers_info[count]['name'] = provider_names[count]['name']
+            providers_info[count]['url_avatar'] = provider_names[count]['url_avatar']
             count += 1
 
         return providers_info
 
-    def append_review_to_provider(self, providers_info):
+    def consult_provider_review(self, provider_id):
         try:
-            for provider in providers_info:
-                provider_id = int(provider['provider_id'])
-                reviews_response = requests.get(
-                    'https://pax-gateway.herokuapp.com/api/v1/review/service_reviews/average/{}'.format(provider_id))
-                if not reviews_response:
-                    return jsonify('Inexistent id in review service'), 404
-                reviews_response = reviews_response.json()
-                if provider['provider_id'] == provider_id:
-                    provider['reviews_average'] = reviews_response["provider_service_review_average"]
-            return providers_info
-
+            response = requests.get(
+                'https://pax-gateway.herokuapp.com/api/v1/review/service_reviews/average/{}'.format(provider_id))
+            response_json = response.json()
+            if response.status_code != 200:
+                provider_review = 0
+            else:
+                provider_review = response_json['provider_service_review_average']
         except ConnectionError:
-            return jsonfiy(createFailMessage('Could not connect to review service')), 400
+            provider_review = 0
+        return provider_review
+
+    def append_review_to_provider(self, providers_info):
+        for provider in providers_info:
+            provider_id = int(provider['provider_id'])
+            provider_review = self.consult_provider_review(provider_id)
+            provider['reviews_average'] = provider_review
+        return providers_info
 
     def createFailMessage(self, message):
         response_object = {
@@ -69,7 +74,6 @@ class Utils:
             'message': '{}'.format(message)
         }
         return response_object
-
 
     def createSuccessMessage(self, message):
         response_object = {
