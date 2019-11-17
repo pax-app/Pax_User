@@ -85,7 +85,6 @@ def user_login():
 
 # Logout for access
 @users_blueprint.route('/auth/logout', methods=['GET'])
-@authenticate
 def user_logout(resp):
     response_object = {
         'status': 'success',
@@ -95,7 +94,6 @@ def user_logout(resp):
 
 
 @users_blueprint.route('/auth/status', methods=['GET'])
-@authenticate
 def get_user_status(resp):
     user = UserModel.query.filter_by(user_id=resp).first()
     auth_token = user.encode_auth_token(user.user_id)
@@ -108,7 +106,6 @@ def get_user_status(resp):
 
 # Provider Registration Route
 @users_blueprint.route('/provider_registration', methods=['POST'])
-@authenticate
 def provider_registration(resp):
     post_data = request.json
 
