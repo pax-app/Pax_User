@@ -42,7 +42,8 @@ def user_registration():
         response_object["name"] = name
         response_object["email"] = email
         response_object["id"] = user.user_id
-        response_object["is_provider"] = provider is not None
+        response_object["is_provider"] = False
+        response_object["provider_id"] = None
         return jsonify(response_object), 201
     except:
         db.session.rollback()
@@ -75,6 +76,7 @@ def user_login():
             response_object["email"] = current_user.email
             response_object["id"] = current_user.user_id
             response_object["is_provider"] = provider is not None
+            response_object["provider_id"] = provider.provider_id if provider is not None else None
 
             return jsonify(response_object), 200
         else:
@@ -138,6 +140,7 @@ def provider_registration():
         provider.save_to_db()
         response_object = Utils().createSuccessMessage('Provider was created')
         provider = ProviderModel.find_provider(user_id)
+        response_object["provider_id"] = provider.provider_id if provider is not None else None
         for category in categories:
             work = WorksModel(category["id"], provider.provider_id)
             work.save_to_db()
