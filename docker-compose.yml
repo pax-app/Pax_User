@@ -2,6 +2,7 @@ version: "3.6"
 
 services:
   user-service:
+    build: .
     image: paxapp/pax-user:latest
     volumes:
       - ".:/app"
@@ -9,3 +10,9 @@ services:
       - 5001:5000
     environment:
       - FLASK_APP=project/__init__.py
+      - FLASK_ENV=development
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=mysql+pymysql://paxadmin:LpvuM1QnfcxOOVeNQQvl@pax-database.cd0j8avv0tgq.sa-east-1.rds.amazonaws.com:3306/paxdb
+      - DATABASE_TEST_URL=mysql+pymysql://username:password@localhost:3306/pax
+      - SECRET_KEY=my_precious
+    command: python manage.py run -h 0.0.0.0
