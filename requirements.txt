@@ -1,6 +1,6 @@
 pymysql
 ConfigParser
-Flask==1.0.2
+Flask==2.3.2
 Flask-SQLAlchemy==2.3.2
 sqlalchemy_utils
 passlib
